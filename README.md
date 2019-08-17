@@ -9,7 +9,7 @@ Läs mer på Enkelts webbsida: [enkelt.io](https://enkelt.io)
 Enkelt är fri programvara och använder GNU GPL v3 licensen. Läs mer om licensen på [gnu.org](https://gnu.org)
 
 # Problem och bugg -raportering
-Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email eller göra en ny _issue_ på Enkelt-Dev förvaret [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub account.
+Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email eller göra en ny _issue_ på Enkelt-Dev förvaret [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub profil.
 
 ## Utvecklare
 ### Enkelt har arbetats på och utvecklats av följande personer:
@@ -17,3 +17,21 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email
 * _Edvard Busck-Nielsen_ (2018, 2019)
 
 * _Morgan Williams_ (2019)
+
+# Länkar
+
+#### Webbsidor:
+
+* Enkelts webbsida [enkelt.io](https://enkelt.io)
+
+* Enkelts webbredigerare [redigerare.enkelt.io](https://redigerare.enkelt.io)
+
+* Enkelt bibliotek [bibliotek.enkelt.io](https://bibliotek.enkelt.io)
+
+#### GitHub
+
+* Enkelt på GitHub: [Enkelt](https://github.com/Enkelt)
+
+* Enkelt projektet på GitHub: [Enkelt](https://github.com/Enkelt/Enkelt)
+
+* Enkelt utveckling på GitHub: [Enkelt](https://github.com/Enkelt/Enkelt-Dev)
