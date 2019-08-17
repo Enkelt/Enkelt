@@ -30,8 +30,8 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email
 
 #### GitHub
 
-* Enkelt på GitHub: [Enkelt](https://github.com/Enkelt)
+* Enkelt organisationen på GitHub: [Enkelt](https://github.com/Enkelt)
 
-* Enkelt projektet på GitHub: [Enkelt](https://github.com/Enkelt/Enkelt)
+* Enkelt projektet på GitHub: [Enkelt/Enkelt](https://github.com/Enkelt/Enkelt)
 
-* Enkelt utveckling på GitHub: [Enkelt](https://github.com/Enkelt/Enkelt-Dev)
+* Enkelt utveckling på GitHub: [Enkelt-Dev](https://github.com/Enkelt/Enkelt-Dev)
