@@ -11,8 +11,8 @@ Enkelt är fri programvara och använder GNU GPL v3 licensen. Läs mer om licens
 # Problem och bugg -raportering
 Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email eller göra en ny _issue_ på Enkelt-Dev förvaret [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub profil.
 
-## Utvecklare
-### Enkelt har arbetats på och utvecklats av följande personer:
+# Utvecklare
+## Enkelt har arbetats på och utvecklats av följande personer:
 
 * _Edvard Busck-Nielsen_ (2018, 2019)
 
@@ -20,7 +20,7 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email
 
 # Länkar
 
-#### Webbsidor:
+## Webbsidor:
 
 * Enkelts webbsida [enkelt.io](https://enkelt.io)
 
@@ -28,7 +28,7 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email
 
 * Enkelt bibliotek [bibliotek.enkelt.io](https://bibliotek.enkelt.io)
 
-#### GitHub
+## GitHub
 
 * Enkelt organisationen på GitHub: [Enkelt](https://github.com/Enkelt)
 
@@ -40,7 +40,7 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email
 <hr>
 <br>
 
-## English
+##### English
 
 # Enkelt
 The Enkelt programming language. Program in Swedish with Enkelt, the worls first swedish programminglanguage. Enkelt's syntax is to onehundered percent in the swedish language. Enkelt is designed for use in programming education.
@@ -55,8 +55,8 @@ Enkelt is free software and uses the GNU GPL v3 license. Read more about the GPL
 # Issue and bug reporting
 If you find issues or bugs in Enkelt please contact use by either sending us an email or by creating a new issue on the [Enkelt-Dev repository](https://github.com/Enkelt/Enkelt-Dev/issues), but that requires a GitHub account.
 
-## Developers
-### Enkelt has been developed by the following people:
+# Developers
+## Enkelt has been developed by the following people:
 
 * _Edvard Busck-Nielsen_ (2018, 2019)
 
@@ -64,7 +64,7 @@ If you find issues or bugs in Enkelt please contact use by either sending us an 
 
 # Links
 
-#### Websites:
+## Websites:
 
 * Enkelt's website [enkelt.io](https://enkelt.io)
 
@@ -72,7 +72,7 @@ If you find issues or bugs in Enkelt please contact use by either sending us an 
 
 * Enkelt libraries [bibliotek.enkelt.io](https://bibliotek.enkelt.io)
 
-#### GitHub
+## GitHub
 
 * The Enkelt organization on GitHub: [Enkelt](https://github.com/Enkelt)
 
