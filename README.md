@@ -8,7 +8,7 @@ Läs mer på Enkelts webbsida: [enkelt.io](https://enkelt.io)
 # Licens
 Enkelt är fri programvara och använder GNU GPL v3 licensen. Läs mer om licensen på [gnu.org](https://gnu.org)
 
-# Problem och bugg -raportering
+# Problem och bugg -rapportering
 Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email eller göra en ny _issue_ på Enkelt-Dev förvaret [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub profil.
 
 # Utvecklare
