@@ -1,5 +1,6 @@
 # Enkelt
-Enkelt programmeringsspråket. Programmera på svenska med Enkelt, världens första svenska programmeringsspråk. Enkelt använder en hundraprocentig svenskspråkig syntax och är utvecklar och designat för användning i undervisning i programmering.
+Enkelt är världens första svenskspråkiga programmeringsspråk, och det perfekta valet för programmeringsundervisning på svenska.
+
 Läs mer på Enkelts webbsida: [enkelt.io](https://enkelt.io)
 
 # Kontakt
@@ -9,12 +10,12 @@ Läs mer på Enkelts webbsida: [enkelt.io](https://enkelt.io)
 Enkelt är fri programvara och använder GNU GPL v3 licensen. Läs mer om licensen på [gnu.org](https://gnu.org)
 
 # Problem och bugg -rapportering
-Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email eller göra en ny _issue_ på Enkelt-Dev förvaret [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub profil.
+Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett e-postmeddelande eller göra en ny _issue_ på Enkelt-Dev förvaret [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub-profil.
 
 # Utvecklare
 ## Enkelt har arbetats på och utvecklats av följande personer:
 
-* _Edvard Busck-Nielsen_ (2018, 2019)
+* _Edvard Busck-Nielsen_ (2018, 2019, 2020)
 
 * _Morgan Williams_ (2019)
 
@@ -30,11 +31,11 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email
 
 ## GitHub
 
-* Enkelt organisationen på GitHub: [Enkelt](https://github.com/Enkelt)
+* Enkelt-organisationen på GitHub: [Enkelt](https://github.com/Enkelt)
 
-* Enkelt projektet på GitHub: [Enkelt/Enkelt](https://github.com/Enkelt/Enkelt)
+* Enkelt-projektet på GitHub: [Enkelt/Enkelt](https://github.com/Enkelt/Enkelt)
 
-* Enkelt utveckling på GitHub: [Enkelt-Dev](https://github.com/Enkelt/Enkelt-Dev)
+* Enkelts utveckling på GitHub: [Enkelt-Dev](https://github.com/Enkelt/Enkelt-Dev)
 
 <br>
 <hr>
@@ -43,7 +44,8 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett email
 ##### English
 
 # Enkelt
-The Enkelt programming language. Program in Swedish with Enkelt, the worls first swedish programminglanguage. Enkelt's syntax is to onehundered percent in the swedish language. Enkelt is designed for use in programming education.
+Enkelt is the worlds first Swedish-language programming language, and the perfect choice for programming eucation in swedish.
+
 Read more (swedish only) on Enkelt's website: [enkelt.io](https://enkelt.io)
 
 # Contact
@@ -58,7 +60,7 @@ If you find issues or bugs in Enkelt please contact use by either sending us an 
 # Developers
 ## Enkelt has been developed by the following people:
 
-* _Edvard Busck-Nielsen_ (2018, 2019)
+* _Edvard Busck-Nielsen_ (2018, 2019, 2020)
 
 * _Morgan Williams_ (2019)
 
