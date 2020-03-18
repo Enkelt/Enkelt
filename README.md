@@ -1,5 +1,5 @@
 # Enkelt
-Enkelt är världens första svenskspråkiga programmeringsspråk, och det perfekta valet för programmeringsundervisning på svenska.
+Enkelt är världens första svenskspråkiga programmeringsspråk, och det perfekta valet för programmeringsundervisning på svenska. Om du vill hjälpa till med utvecklingen kan du göra det via [Enkelt-Dev repo:n](https://github.com/Enkelt/Enkelt-Dev)
 
 Läs mer på Enkelts webbsida: [enkelt.io](https://enkelt.io)
 
