@@ -1,6 +1,6 @@
 # coding=utf-8
 
-# Enkelt 3.1
+# Enkelt 4.0
 # Copyright 2018, 2019, 2020 Edvard Busck-Nielsen, 2019 Morgan Willliams.
 # This file is part of Enkelt.
 #
@@ -20,11 +20,105 @@
 import sys
 import re
 import os
+import collections
+import urllib.request
+
+# For the standard library
+import math
+import time
+import datetime
 
 
 # ####### #
 # CLASSES #
 # ####### #
+
+class StandardLibrary:
+    class matte:
+        @staticmethod
+        def tak(val):
+            return math.ceil(val)
+
+        @staticmethod
+        def golv(val):
+            return math.floor(val)
+
+        @staticmethod
+        def fakultet(val):
+            return math.factorial(val)
+
+        @staticmethod
+        def sin(val):
+            return math.sin(val)
+
+        @staticmethod
+        def cos(val):
+            return math.cos(val)
+
+        @staticmethod
+        def tan(val):
+            return math.tan(val)
+
+        @staticmethod
+        def asin(val):
+            return math.asin(val)
+
+        @staticmethod
+        def acos(val):
+            return math.acos(val)
+
+        @staticmethod
+        def atan(val):
+            return math.atan(val)
+
+        @staticmethod
+        def potens(val, pow_to):
+            return math.pow(val, pow_to)
+
+        @staticmethod
+        def kvadratrot(val):
+            return math.sqrt(val)
+
+        @staticmethod
+        def log(val):
+            return math.log(val)
+
+        @staticmethod
+        def grader(val):
+            return math.degrees(val)
+
+        @staticmethod
+        def radianer(val):
+            return math.radians(val)
+
+        @staticmethod
+        def e():
+            return math.e
+
+        @staticmethod
+        def pi():
+            return math.pi
+
+    class tid:
+        @staticmethod
+        def epok():
+            return time.time()
+
+        @staticmethod
+        def tid():
+            return time.ctime()
+
+        @staticmethod
+        def datum(year, month, day):
+            return datetime.date(year, month, day)
+
+        @staticmethod
+        def nu():
+            return datetime.datetime.now()
+
+        @staticmethod
+        def idag():
+            return datetime.date.today()
 
 
 class ErrorClass:
@@ -43,7 +137,7 @@ class ErrorClass:
         return ''
 
     def get_error_message_data(self):
-        if self.error == "module 'final_transpiled' has no attribute '__Enkelt__'":
+        if self.error == "module 'final_transpiled' has no attribute '__enkelt__'":
             return 'IGNORED'
 
         from googletrans import Translator
@@ -75,19 +169,46 @@ def enkelt_print(data):
     print(translate_output_to_swedish(data))
 
 
+def enkelt_input(prompt=''):
+    tmp = input(prompt)
+
+    try:
+        tmp = int(tmp)
+        return tmp
+    except ValueError:
+        try:
+            tmp = float(tmp)
+            return tmp
+        except ValueError:
+            return str(tmp)
+
+
 # ############ #
 # Main Methods #
 # ############ #
 
 def translate_output_to_swedish(data):
+    if isinstance(data, collections.abc.KeysView):
+        data = list(data)
     data = str(data)
-    return data.replace("True", "Sant").replace("False", "Falskt").replace("<class \'float\'>", "decimaltal").replace(
-        "<class \'str\'>", "sträng").replace("<class \'int\'>", "heltal").replace("<class \'list\'>", "lista").replace(
-        "<class \'dict\'>", "lexikon").replace("<class \'bool\'>", "boolesk").replace("<class \'NoneType\'>", "inget")
+    data = data.replace("True", "Sant").replace(
+        'False', 'Falskt').replace(
+        '<class \'float\'>', 'decimaltal').replace(
+        '<class \'str\'>', 'sträng').replace(
+        '<class \'int\'>', 'heltal').replace(
+        '<class \'list\'>', 'lista').replace(
+        '<class \'dict\'>', 'lexikon').replace(
+        '<class \'bool\'>', 'boolesk').replace(
+        '<class \'NoneType\'>', 'inget').replace(
+        '<class \'Exception\'>', 'Feltyp').replace(
+        '<class \'datetime.date\'>', 'datum').replace(
+        '<class \'datetime.datetime\'>', 'datum & tid').replace(
+        '<class \'range\'>', 'område')
+
+    return data
 
 
 def check_for_updates(version_nr):
-    import urllib.request
     import json
 
     global repo_location
@@ -103,6 +224,15 @@ def check_for_updates(version_nr):
             version_nr) + ' men du kan uppdatera till Enkelt version ' + str(data_store['version']))
 
 
+def get_functions_from_lexed_library_code(data, library_name):
+    for token_index, _ in enumerate(data):
+        if data[token_index][0] == 'USER_FUNCTION':
+            data[token_index][1] = library_name + '.' + data[token_index][1]
+            user_functions[-1] = library_name + '.' + user_functions[-1]
+
+    return data
+
+
 def transpile_library_code(library_code, library_name):
     global final
     global source_code
@@ -111,13 +241,9 @@ def transpile_library_code(library_code, library_name):
     for line in library_code:
         if line != '\n':
             data = fix_up_code_line(line)
-
             data = lex(data)
 
-            for token_index, _ in enumerate(data):
-                if data[token_index][0] == 'USER_FUNCTION':
-                    data[token_index][1] = library_name + '.' + data[token_index][1]
-                    user_functions[-1] = library_name + '.' + user_functions[-1]
+            data = get_functions_from_lexed_library_code(data, library_name)
 
             if is_extension:
                 source_code.append(line)
@@ -155,47 +281,47 @@ def get_import(file_or_code, is_file, library_name):
     transpile_library_code(library_code, library_name)
 
 
-def import_library_or_extension(library_name):
-    import urllib.request
+def load_library_from_remote(url, library_name):
+    response = urllib.request.urlopen(url)
+    library_code = response.read().decode('utf-8')
+
+    library_code = library_code.split('\n')
+
+    get_import(library_code, False, library_name)
+
+
+def import_library(library_name):
     from urllib.error import HTTPError
 
     global enkelt_script_path
     global web_import_location
 
-    # Checks if the library/extension is user-made (i.e. local not remote).
+    # Checks if the library is user-made (i.e. local not remote).
     import_file = ''.join(enkelt_script_path.split('/')[:-1]) + '/' + library_name + '.e'
-    extension_file = import_file[:-2]+'.epy'
 
     if os.path.isfile(import_file):
         get_import(import_file, True, library_name)
+        return
 
-    elif os.path.isfile(extension_file):
-        get_import(extension_file, True, library_name)
+    # The library might be a local extension (.epy file)
+    import_file += 'py'
+    if os.path.isfile(import_file):
+        get_import(import_file, True, library_name)
 
+    # The library might be remote (i.e. needs to be fetched)
     else:
-        # The library/extension is remote (i.e. needs to be fetched)
         url = web_import_location + library_name + '.e'
 
         try:
-            response = urllib.request.urlopen(url)
-            module_code = response.read().decode('utf-8')
-
-            module_code = module_code.split('\n')
-
-            get_import(module_code, False, library_name)
-
+            load_library_from_remote(url, library_name)
         except HTTPError:
-            url = url[:-2] + '.epy'
+            # The library might be a remote extension (.epy file)
+            url += 'py'
 
             try:
-                response = urllib.request.urlopen(url)
-                module_code = response.read().decode('utf-8')
-
-                module_code = module_code.split('\n')
-
-                get_import(module_code, False, library_name)
+                load_library_from_remote(url, library_name)
             except HTTPError:
-                print('Error! Kunde inte importera ' + library_name)
+                print('Det inträffade ett fel!! Kunde inte importera ' + library_name)
 
 
 def translate_clear():
@@ -220,14 +346,14 @@ def get_errors():
     }
 
 
-def functions_and_keywords():
+def functions_keywords_and_obj_notations():
     return {
         'functions': {
             # Functions with no statuses in parse()
             'skriv': 'print',
             'in': 'input',
-            'Text': 'str',
-            'Nummer': 'int',
+            'Sträng': 'str',
+            'Heltal': 'int',
             'Decimal': 'float',
             'Bool': 'bool',
             'längd': 'len',
@@ -238,62 +364,47 @@ def functions_and_keywords():
             'slumpval': '__import__("random").choice',
             'blanda': '__import__("random").shuffle',
             'området': 'range',
-            'abs': 'abs',
             'lista': 'list',
             'ärnum': 'isdigit',
             'runda': 'round',
             'versal': 'upper',
             'gemen': 'lower',
+            'ärversal': 'isupper',
+            'ärgemen': 'islower',
             'ersätt': 'replace',
             'infoga': 'insert',
             'index': 'index',
             'dela': 'split',
             'foga': 'join',
             'typ': 'type',
-            'sin': '__import__("math").sin',
-            'cos': '__import__("math").cos',
-            'tan': '__import__("math").tan',
-            'potens': '__import__("math").pow',
-            'asin': '__import__("math").asin',
-            'atan': '__import__("math").atan',
-            'acos': '__import__("math").acos',
-            'tak': '__import__("math").ceil',
-            'golv': '__import__("math").floor',
-            'log': '__import__("math").log',
-            'kvadratrot': '__import__("math").sqrt',
-            'grader': '__import__("math").degrees',
-            'radianer': '__import__("math").radians',
-            'fakultet': '__import__("math").factorial',
-            'datum': '__import__("datetime").date',
-            'veckodag': 'weekday',
             'läs': 'read',
             'överför': 'write',
-            'epok': '__import__("time").time',
-            'tid': '__import__("time").ctime',
-            'nu': '__import__("datetime").datetime.now',
-            'idag': '__import__("datetime").date.today',
+            'veckodag': 'weekday',
             'värden': 'values',
             'element': 'elements',
             'numrera': 'enumerate',
             'töm': 'os.system("' + translate_clear() + '"',
+            'kasta': 'raise Exception',
+            'nycklar': 'keys',
             # Functions with statuses in parse()
             'om': 'if',
             'anom': 'elif',
             'öppna': 'with open',
             'för': 'for',
-            'medan': 'while'
+            'medan': 'while',
         },
         'keywords': {
             'Sant': 'True',
             'Falskt': 'False',
-            'inom': ' in ',
+            'inom': 'in ',
             'bryt': 'break',
             'fortsätt': 'continue',
             'returnera': 'return ',
             'inte': 'not',
             'passera': 'pass',
-            'matte_e': '__import__("math").e',
-            'matte_pi': '__import__("math").pi',
+            'annars': 'else',
+            'och': ' and ',
+            'eller': ' or ',
             'år': 'year',
             'månad': 'month',
             'dag': 'day',
@@ -301,13 +412,19 @@ def functions_and_keywords():
             'minut': 'minute',
             'sekund': 'second',
             'mikrosekund': 'microsecond',
-            'annars': 'else',
-            'och': ' and ',
-            'eller': ' or ',
-            'som': ' as ',
-            'klass': 'class ',
+            'global': 'global '
         },
+        'obj_notations': {
+            'klass': 'class ',
+            'försök': 'try',
+            'fånga': 'except Exception as ',
+            'slutligen': 'finally'
+        }
     }
+
+
+def get_obj_notations():
+    return ['klass', 'försök', 'fånga']
 
 
 def operator_symbols():
@@ -315,11 +432,11 @@ def operator_symbols():
 
 
 def forbidden_variable_names():
-    return ['in', 'str', 'int', 'list', 'num', 'matte_e', 'matte_pi', 'själv']
+    return ['in', 'själv']
 
 
 def translate_function(func):
-    function_translations = functions_and_keywords()['functions']
+    function_translations = functions_keywords_and_obj_notations()['functions']
 
     return function_translations[func] if func in function_translations.keys() else 'error'
 
@@ -330,8 +447,14 @@ def transpile_function(func):
     source_code.append(translate_function(func) + '(')
 
 
+def translate_obj_notation(obj_notation):
+    obj_notation_translations = functions_keywords_and_obj_notations()['obj_notations']
+
+    return obj_notation_translations[obj_notation] if obj_notation in obj_notation_translations.keys() else 'error'
+
+
 def translate_keyword(keyword):
-    keyword_translations = functions_and_keywords()['keywords']
+    keyword_translations = functions_keywords_and_obj_notations()['keywords']
 
     return keyword_translations[keyword] if keyword in keyword_translations.keys() else 'error'
 
@@ -353,6 +476,9 @@ def parse(lexed, token_index):
     global needs_start_statuses
     global is_file_open
     global is_extension
+    global is_lambda
+
+    global standard_library
 
     forbidden = forbidden_variable_names()
 
@@ -375,10 +501,9 @@ def parse(lexed, token_index):
         is_comment = True
     elif token_type == 'FUNCTION':
         # Specific functions & function cases that ex. required updating of statuses.
-        if token_val == 'skriv' and is_console_mode is False:
-            source_code.append('Enkelt.enkelt_print(')
-        elif token_val == 'matte':
-            is_math = True
+        if token_val == 'skriv' or token_val == 'in' and is_console_mode is False:
+            tmp = 'Enkelt.enkelt_'
+            source_code.append(tmp + 'print(' if token_val == 'skriv' else tmp + 'input(')
         elif token_val == 'om' or token_val == 'anom':
             source_code.append(translate_function(token_val) + ' ')
             is_if = True
@@ -391,6 +516,8 @@ def parse(lexed, token_index):
             look_for_loop_ending = True
             if token_val == 'för':
                 is_for = True
+        elif token_val == 'töm':
+            source_code.append(translate_function(token_val))
         # Every other function get's transpiled in the same way.
         else:
             transpile_function(token_val)
@@ -400,7 +527,7 @@ def parse(lexed, token_index):
         elif token_val == 'själv':
             source_code.append('self')
         else:
-            print('Error namnet ' + token_val + " är inte tillåtet som variabelnamn!")
+            print('Det inträffade ett fel! namnet ' + token_val + " är inte tillåtet som variabelnamn!")
     elif token_type == 'STRING':
         if is_file_open and len(token_val) <= 2:
             token_val = token_val.replace('l', 'r').replace('ö', 'w')
@@ -410,7 +537,7 @@ def parse(lexed, token_index):
     elif token_type == 'IMPORT' or token_type == 'EXTENSION':
         if token_type == 'EXTENSION':
             is_extension = True
-        import_library_or_extension(token_val)
+        import_library(token_val)
     elif token_type == 'OPERATOR':
         # Special operator cases
         if is_if and token_val == ')':
@@ -418,27 +545,33 @@ def parse(lexed, token_index):
             needs_start_statuses.append(True)
         elif is_math and token_val == ')':
             is_math = False
-        elif is_for and token_val == ';':
-            is_for = False
         elif look_for_loop_ending and token_val == ')':
             look_for_loop_ending = False
             needs_start_statuses.append(True)
+        elif token_val == '>' and lexed[token_index-1][1] == '=' and lexed[token_index+1][0] == 'USER_FUNCTION_CALL':
+            is_lambda = True
+            source_code.append('lambda ')
+        elif is_lambda and token_val == ')':
+            source_code.append(': ')
         # All other operators just gets appended to the source
         else:
             source_code.append(token_val)
     elif token_type == 'LIST_START' or token_type == 'LIST_END':
         source_code.append(token_val)
     elif token_type == 'START':
-        if needs_start is False:
-            source_code.append(token_val)
-        elif len(lexed) - 1 == token_index:
-            source_code.append(':')
-        else:
-            source_code.append(':' + '\n')
-        if needs_start:
-            indent_layers.append("x")
+        if is_lambda is False:
+            if needs_start is False:
+                source_code.append(token_val)
+            elif len(lexed) - 1 == token_index:
+                source_code.append(':')
+            else:
+                source_code.append(':' + '\n')
+            if needs_start:
+                indent_layers.append("x")
     elif token_type == 'END':
-        if needs_start is False:
+        if is_lambda:
+            is_lambda = False
+        elif needs_start is False:
             source_code.append(token_val)
         else:
             needs_start_statuses.pop(-1)
@@ -457,22 +590,33 @@ def parse(lexed, token_index):
             transpile_keyword(token_val)
     elif token_type == 'USER_FUNCTION':
         # Needed when functions are imported functions
-        token_val = token_val.replace('.', '__IMPORTED__')
+        token_val = token_val.replace('.', '__enkelt__')
         source_code.append('def ' + token_val + '(')
         needs_start_statuses.append(True)
-    elif token_type == 'USER_FUNCTION_CALL':
-        # Needed when functions are imported functions
-        token_val = token_val.replace('.', '__IMPORTED__')
+    elif token_type == 'USER_FUNCTION_CALL' and is_lambda is False:
+        if '.' in token_val:
+            if token_val.split('.')[0] in standard_library:
+                # The function is part of the standard library
+                library = token_val.split('.')[0]
+                rest = ''.join(token_val.split('.')[1:])
+
+                token_val = 'Enkelt.StandardLibrary.' + library + '.' + rest
+            else:
+                # Function is an imported functions
+                token_val = token_val.replace('.', '__enkelt__')
         source_code.append(token_val + '(')
-    elif token_type == 'CLASS':
+    elif token_type == 'OBJ_NOTATION':
+        source_code.append(translate_obj_notation(token_val))
+        needs_start_statuses.append(True)
+    elif token_type == 'OBJ_NOTATION_PARAM':
         source_code.append(' ' + token_val)
         needs_start_statuses.append(True)
+    elif token_type == 'LAMBDA_CALL':
+        source_code.append(token_val)
 
     # Recursively calls parse() when there is more code to parse
     if len(lexed) - 1 >= token_index + 1 and is_comment is False:
         parse(lexed, token_index + 1)
-
-    return source_code
 
 
 def lex(line):
@@ -481,14 +625,16 @@ def lex(line):
 
     global user_functions
     global imported_libraries
+    global standard_library
 
     operators = operator_symbols()
+    obj_notations = get_obj_notations()
 
     tmp_data = ''
     is_string = False
     is_var = False
     is_function = False
-    is_class = False
+    is_obj_notation = False
     is_import = False
     is_extension_mode = False
     lexed_data = []
@@ -512,12 +658,12 @@ def lex(line):
             tmp_data = ''
             is_function = False
         elif char == '{' and is_var is False:
-            if is_class:
-                lexed_data.append(['CLASS', tmp_data])
+            if is_obj_notation:
+                lexed_data.append(['OBJ_NOTATION_PARAM', tmp_data])
                 tmp_data = ''
-                is_class = False
+                is_obj_notation = False
             lexed_data.append(['START', char])
-        elif char == '}':
+        elif char == '}' and is_var is False:
             lexed_data.append(['END', char])
         elif char == '#' and is_string is False:
             break
@@ -561,7 +707,7 @@ def lex(line):
                         is_var = True
                         tmp_data = ''
                     elif is_var:
-                        if char != ' ' and char != '=' and char not in operators and char != '[' and char != ']' and char != '{' and char != '}':
+                        if char != ' ' and char != '=' and char not in operators and char != '[' and char != ']' and char != '{' and char != '}' and char != '(':
                             tmp_data += char
                             if len(line) - 1 == chr_index:
                                 is_var = False
@@ -570,7 +716,10 @@ def lex(line):
                         elif char == '=' or char in operators:
                             is_var = False
                             lexed_data.append(['VAR', tmp_data])
-                            lexed_data.append(['OPERATOR', char])
+                            if char != ';':
+                                lexed_data.append(['OPERATOR', char])
+                            else:
+                                lexed_data[-1][-1] = tmp_data + ' '
                             tmp_data = ''
                         elif char == '[':
                             is_var = False
@@ -582,16 +731,21 @@ def lex(line):
                             lexed_data.append(['VAR', tmp_data])
                             lexed_data.append(['LIST_END', '['])
                             tmp_data = ''
-                        elif char == '{':
+                        elif char == '{' or char == '}':
                             is_var = False
                             lexed_data.append(['VAR', tmp_data])
-                            lexed_data.append(['START', char])
+                            lexed_data.append(['START' if char == '{' else 'END', char])
                             tmp_data = ''
-                    elif char in operators and tmp_data not in imported_libraries:
+                        elif char == '(':
+                            is_var = False
+                            lexed_data.append(['VAR', tmp_data])
+                            lexed_data.append(['LAMBDA_CALL', char])
+                            tmp_data = ''
+                    elif char in operators and tmp_data not in imported_libraries and tmp_data not in standard_library:
                         lexed_data.append(['OPERATOR', char])
-                    elif char in imported_libraries and char != '.':
+                    elif char in imported_libraries or char in standard_library and char != '.':
                         lexed_data.append(['OPERATOR', char])
-                    elif char in imported_libraries and char == '.':
+                    elif char in imported_libraries or char in standard_library and char == '.':
                         tmp_data += char
                     else:
                         if tmp_data == 'Sant' or tmp_data == 'Falskt':
@@ -599,8 +753,6 @@ def lex(line):
                             tmp_data = ''
                         else:
                             if char == '(' and translate_function(tmp_data) != 'error':
-                                if tmp_data == 'matte':
-                                    tmp_data = 'Nummer'
                                 lexed_data.append(['FUNCTION', tmp_data])
                                 tmp_data = ''
                             elif char == '(' and tmp_data in user_functions or char == '(' and translate_function(
@@ -616,27 +768,18 @@ def lex(line):
                                 else:
                                     if translate_keyword(tmp_data) != 'error':
                                         lexed_data.append(['KEYWORD', tmp_data])
-                                        tmp_data = ""
+                                        tmp_data = ''
                                     elif tmp_data == 'def':
                                         is_function = True
                                         tmp_data = ''
-                                    elif tmp_data == 'var':
-                                        is_var = True
-                                        tmp_data = ''
-                                    elif tmp_data == 'importera':
+                                    elif tmp_data == 'importera' or tmp_data == 'utöka':
                                         is_import = True
+                                        is_extension_mode = True if (tmp_data == 'utöka') else False
                                         tmp_data = ''
-                                    elif tmp_data == 'utöka':
-                                        is_extension_mode = True
-                                        is_import = True
+                                    elif tmp_data in obj_notations:
+                                        lexed_data.append(['OBJ_NOTATION', tmp_data])
                                         tmp_data = ''
-                                    elif tmp_data == 'matte_e' or tmp_data == 'töm' and line[-3:] == 'töm':
-                                        lexed_data.append(['KEYWORD', tmp_data])
-                                        tmp_data = ''
-                                    elif tmp_data == 'klass':
-                                        lexed_data.append(['KEYWORD', tmp_data])
-                                        tmp_data = ''
-                                        is_class = True
+                                        is_obj_notation = True
 
     return lexed_data
 
@@ -706,7 +849,7 @@ def run_transpiled_code():
 
     if is_console_mode is False:
         # Inserts necessary code to make importing a temporary python file work.
-        code_to_append = "import enkelt as Enkelt\ndef __Enkelt__():\n\tprint('', end='')\n"
+        code_to_append = """import enkelt as Enkelt\ndef __enkelt__():\n\tprint('', end='')\n"""
         final.insert(0, code_to_append)
 
     code = fix_up_and_prepare_transpiled_code()
@@ -727,14 +870,15 @@ def run_transpiled_code():
             # This line will show an error;
             # it's importing a temporary file that get's created (and deleted) by this script.
             import final_transpiled
-            final_transpiled.__Enkelt__()
+            final_transpiled.__enkelt__()
         # The "fallback"/console execution process.
         else:
             exec(code)
     except Exception as err:
         if is_developer_mode:
-            print('--DEV: run_final_transpiled_code, error')
-            print(err)
+            if str(err) != 'module \'final_transpiled\' has no attribute \'__enkelt__\'':
+                print('--DEV: run_final_transpiled_code, error')
+                print(err)
 
         # Print out error(s) if any
         error = ErrorClass(str(err).replace('(<string>, ', '('))
@@ -835,7 +979,7 @@ def console_mode(first):
     console_mode(False)
 
 
-# ----- SETUP -----
+# ----- SETUP GLOBAL VARIABLES -----
 
 is_list = False
 is_if = False
@@ -845,12 +989,14 @@ look_for_loop_ending = False
 needs_start_statuses = [False]
 is_file_open = False
 is_extension = False
+is_lambda = False
 
 is_console_mode = False
 
 source_code = []
 indent_layers = []
 imported_libraries = []
+standard_library = ['matte', 'tid']
 user_functions = []
 
 # When user/dev tests
@@ -858,7 +1004,7 @@ is_developer_mode = False
 # Gets an env. variable to check if it's a circle-ci test run.
 is_dev = os.getenv('ENKELT_DEV', False)
 
-version = 3.1
+version = 3.2
 repo_location = 'https://raw.githubusercontent.com/Enkelt/Enkelt/'
 web_import_location = 'https://raw.githubusercontent.com/Enkelt/EnkeltWeb/master/bibliotek/bib/'
 
