@@ -1004,7 +1004,7 @@ is_developer_mode = False
 # Gets an env. variable to check if it's a circle-ci test run.
 is_dev = os.getenv('ENKELT_DEV', False)
 
-version = 3.2
+version = 4.0
 repo_location = 'https://raw.githubusercontent.com/Enkelt/Enkelt/'
 web_import_location = 'https://raw.githubusercontent.com/Enkelt/EnkeltWeb/master/bibliotek/bib/'
 
