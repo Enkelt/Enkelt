@@ -8,7 +8,7 @@ Du kan läsa en snabbstart [här](https://enkelt.io/start).
 
 Ladda ner `enkelt.py` filen från *Enkelt*-mappen.
 
-Kör Enkelt med `python3 enkelt.py [filnamm].e` alternativ `python3 enkelt.py` för konsolläge.
+Kör Enkelt med `python3 enkelt.py [filnamn].e` alternativ `python3 enkelt.py` för konsolläge.
 
 # Kontakt
 [kontakt@enkelt.io](mailto:kontakt@enkelt.io)
