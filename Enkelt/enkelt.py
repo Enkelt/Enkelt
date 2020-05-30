@@ -1,7 +1,7 @@
 # coding=utf-8
 
-# Enkelt 4.0
-# Copyright 2018, 2019, 2020 Edvard Busck-Nielsen, 2019 Morgan Willliams.
+# Enkelt 4.1
+# Copyright 2018, 2019, 2020 Edvard Busck-Nielsen
 # This file is part of Enkelt.
 #
 #     Enkelt is free software: you can redistribute it and/or modify
@@ -501,8 +501,10 @@ def parse(lexed, token_index):
         is_comment = True
     elif token_type == 'FUNCTION':
         # Specific functions & function cases that ex. required updating of statuses.
-        if token_val == 'skriv' or token_val == 'in' and is_console_mode is False:
-            tmp = 'Enkelt.enkelt_'
+        if token_val == 'skriv' or token_val == 'in':
+            tmp = ''
+            if is_console_mode is False:
+                tmp = 'Enkelt.enkelt_'
             source_code.append(tmp + 'print(' if token_val == 'skriv' else tmp + 'input(')
         elif token_val == 'om' or token_val == 'anom':
             source_code.append(translate_function(token_val) + ' ')
@@ -1004,7 +1006,7 @@ is_developer_mode = False
 # Gets an env. variable to check if it's a circle-ci test run.
 is_dev = os.getenv('ENKELT_DEV', False)
 
-version = 4.0
+version = 4.1
 repo_location = 'https://raw.githubusercontent.com/Enkelt/Enkelt/'
 web_import_location = 'https://raw.githubusercontent.com/Enkelt/EnkeltWeb/master/bibliotek/bib/'
 
