@@ -3,13 +3,20 @@ Enkelt är världens första svenskspråkiga programmeringsspråk, och det perfe
 
 Läs mer på Enkelts webbsida: [enkelt.io](https://enkelt.io)
 
+# Kom igång
+Du kan läsa en snabbstart [här](https://enkelt.io/start).
+
+Ladda ner `enkelt.py` filen från *Enkelt*-mappen.
+
+Kör Enkelt med `python3 enkelt.py [filnamn].e` alternativ `python3 enkelt.py` för konsolläge.
+
 # Kontakt
 [kontakt@enkelt.io](mailto:kontakt@enkelt.io)
 
 # Licens
 Enkelt är fri programvara och använder GNU GPL v3 licensen. Läs mer om licensen på [gnu.org](https://gnu.org)
 
-# Problem och bugg -rapportering
+# Problem och buggrapportering
 Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett e-postmeddelande eller göra en ny _problemraport_ på Enkelt-Dev-projektet [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub-profil. Du kan också skicka meddelanden rakt till [mailto:kontakt@enkelt.io](kontakt@enkelt.io)
 
 # Utvecklare
@@ -28,6 +35,8 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett e-pos
 * Enkelts webbredigerare [redigerare.enkelt.io](https://redigerare.enkelt.io)
 
 * Enkelt bibliotek [bibliotek.enkelt.io](https://bibliotek.enkelt.io)
+
+* Enkelts dokuemtnation [dokumentation.enkelt.io](https://dokumentation.enkelt.io)
 
 ## GitHub
 
