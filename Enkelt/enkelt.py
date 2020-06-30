@@ -22,6 +22,7 @@ import re
 import os
 import collections
 import urllib.request
+import codecs
 
 # For the standard library
 import math
@@ -137,7 +138,7 @@ class ErrorClass:
         return ''
 
     def get_error_message_data(self):
-        if self.error == "module 'final_transpiled' has no attribute '__enkelt__'":
+        if "module 'final_transpiled' has no attribute '__enkelt__'" in self.error:
             return 'IGNORED'
 
         from googletrans import Translator
@@ -862,7 +863,7 @@ def run_transpiled_code():
 
     if is_console_mode is False:
         # Writes the transpiled code to a file temporarily.
-        with open('final_transpiled.py', 'w+')as transpiled_f:
+        with codecs.open('final_transpiled.py', 'w', 'utf-8') as transpiled_f:
             transpiled_f.writelines(code)
 
     # Executes the code transpiled to python and catches Exceptions
@@ -889,7 +890,7 @@ def run_transpiled_code():
 
     if is_console_mode is False:
         # Removes the temporary python file.
-        with open('final_transpiled.py', 'w+')as transpiled_f:
+        with codecs.open('final_transpiled.py', 'w', 'utf-8') as transpiled_f:
             transpiled_f.writelines('')
         os.remove(os.getcwd() + '/final_transpiled.py')
 
@@ -1031,7 +1032,7 @@ if not is_dev:
                 if sys.argv[2] == '--d':
                     is_developer_mode = True
 
-            with open(enkelt_script_path, 'r+')as f:
+            with codecs.open(enkelt_script_path, 'r', 'utf-8') as f:
                 tmp_code_to_run = f.readlines()
 
             prepare_and_run_code_lines_to_be_run(tmp_code_to_run)
