@@ -26,6 +26,8 @@ Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett e-pos
 
 * _Morgan Williams_ (2019)
 
+* _Bangyen Pham_ (2020)
+
 # Länkar
 
 ## Webbsidor:
