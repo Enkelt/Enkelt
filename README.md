@@ -1,3 +1,5 @@
+![Ask](https://enkelt.io/banner.png "Enkelt")
+
 # Enkelt
 Enkelt är världens första svenskspråkiga programmeringsspråk, och det perfekta valet för programmeringsundervisning på svenska. Om du vill hjälpa till med utvecklingen kan du göra det via [Enkelt-Dev-projektet](https://github.com/Enkelt/Enkelt-Dev)
 
