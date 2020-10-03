@@ -205,7 +205,7 @@ def transpile_library_code(library_code, library_name):
 	source_code = library_code
 
 	if not is_extension:
-		source_code = lexer(library_code)
+		source_code = lexer([line + '\n' for line in library_code.split('\n')])
 		source_code = parser(source_code)
 		source_code = source_code.split('\n')
 
@@ -291,6 +291,7 @@ def parser(tokens):
 	global built_in_vars
 
 	is_skip = False
+	add_parenthesis_at_en_of_line = False
 
 	parsed = ''
 
@@ -303,6 +304,9 @@ def parser(tokens):
 		token_val = token[1]
 
 		if token_type in ['FORMAT', 'ASSIGN', 'NUM']:
+			if token_val == '\n' and add_parenthesis_at_en_of_line:
+				parsed += ')'
+				add_parenthesis_at_en_of_line = False
 			parsed += token_val
 		elif token_type == 'OP':
 			if token_val in ['.', ')', ',', ':'] and parsed and parsed[-1] == ' ':
@@ -310,11 +314,10 @@ def parser(tokens):
 
 			parsed += token_val
 
-			if token_val in [',', '=', '%']:
+			if token_val in [',', '=']:
 				parsed += ' '
 		elif token_type == 'STR':
-			token_val = token_val.replace('|-ENKELT_ESCAPED_BACKSLASH-|', '\\').replace('|-ENKELT_ESCAPED_QUOTE-|',
-																						'\\"')
+			token_val = token_val.replace('|-ENKELT_ESCAPED_BACKSLASH-|', '\\').replace('|-ENKELT_ESCAPED_QUOTE-|','\\"')
 			parsed += '"' + token_val + '"'
 		elif token_type == 'IMPORT':
 			import_library(token_val)
@@ -322,7 +325,7 @@ def parser(tokens):
 			token_val = translate_keyword(token_val)
 			parsed = maybe_place_space_before(parsed, token_val)
 		elif token_type == 'VAR':
-			if token_val not in built_in_vars:
+			if token_val not in built_in_vars and token_index > 0:
 				parsed = maybe_place_space_before(parsed, token_val)
 			else:
 				parsed += transpile_var(token_val)
@@ -338,8 +341,7 @@ def parser(tokens):
 		elif token_type == 'KEY':
 			parsed += '\'' + token_val + '\''
 
-		if (len(parsed) > 3 and parsed[-1] == ' ' and parsed[-2] == '='
-				and parsed[-3] == ' ' and parsed[-4] == '='):
+		if len(parsed) > 3 and parsed[-1] == ' ' and parsed[-2] == '=' and parsed[-3] == ' ' and parsed[-4] == '=':
 			parsed = parsed[:-4]
 			parsed += ' == '
 
@@ -389,6 +391,7 @@ def lexer(raw):
 		line = fix_up_code_line(line)
 		for char_index, char in enumerate(line):
 			if char == '#':
+				tokens.append(['FORMAT', '\n'])
 				break
 
 			if is_collector:
@@ -434,6 +437,8 @@ def lexer(raw):
 				is_dict.append(True)
 				tokens.append(['OP', char])
 			elif char == '}':
+				tokens, tmp, is_collector, collector_ends, include_collector_end = lex_var_keyword(tokens, tmp)
+
 				is_dict.pop(0)
 				tokens.append(['OP', char])
 			elif char.isdigit() and not tmp:
@@ -451,8 +456,8 @@ def lexer(raw):
 				if char == ':' and is_dict and tmp:
 					tokens.append(['KEY', tmp])
 					tmp = ''
-				else:
-					tokens, tmp, is_collector, collector_ends, include_collector_end = lex_var_keyword(tokens, tmp)
+
+				tokens, tmp, is_collector, collector_ends, include_collector_end = lex_var_keyword(tokens, tmp)
 
 				tokens.append(['OP', char])
 			elif char not in ['\n', '\t', ' ']:
@@ -465,12 +470,47 @@ def lexer(raw):
 	return tokens
 
 
-def fix_up_code_line(statement):
-	is_string = False
+def add_part(parts, is_string, code):
+	parts.append({
+		'is_string': is_string,
+		'code': code
+	})
 
-	return statement.replace("'", '"') \
+	is_string = True
+
+	if code[-1] == '\n':
+		is_string = False
+
+	return parts, '', is_string
+
+
+def fix_up_code_line(statement):
+	statement = statement.replace("'", '"') \
 		.replace('\\"', '|-ENKELT_ESCAPED_QUOTE-|') \
 		.replace('\\', '|-ENKELT_ESCAPED_BACKSLASH-|')
+
+	# Remove spaces between function names and '('.
+	# Replaces four & two spaces with tab.
+	parts = []
+	is_string = False
+	tmp = ''
+
+	for char in statement:
+		tmp += char
+
+		if char == '"' and is_string:
+			parts, tmp, is_string = add_part(parts, True, tmp)
+			is_string = False
+		elif char in ['"', '\n']:
+			parts, tmp, is_string = add_part(parts, False, tmp)
+
+	statement = ''
+	for part in parts:
+		if not part['is_string']:
+			part['code'] = part['code'].replace('    ', '\t').replace('  ', '\t').replace(' (', '(')
+		statement += part['code']
+
+	return statement
 
 
 def build(tokens):
