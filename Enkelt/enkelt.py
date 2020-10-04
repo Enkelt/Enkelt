@@ -19,125 +19,9 @@
 
 
 from sys import argv, version_info
-from os import system, getcwd, path, name, getenv, remove
+from os import getcwd, path, name, getenv, remove
 from collections import abc
 import urllib.request
-
-
-# ####### #
-# CLASSES #
-# ####### #
-
-class StandardLibrary:
-	class tid:
-		import time
-		import datetime
-
-		epok = time.time
-		tid = time.ctime
-		datum = datetime.date
-		nu = datetime.datetime.now
-		idag = datetime.date.today
-
-
-# ############################################### #
-# Modules Used When Executing The Transpiled Code #
-# ############################################### #
-
-def enkelt_print(data):
-	print(translate_output_to_swedish(data))
-
-
-def enkelt_input(prompt=''):
-	tmp = input(prompt)
-
-	try:
-		tmp = int(tmp)
-		return tmp
-	except ValueError:
-		try:
-			tmp = float(tmp)
-			return tmp
-		except ValueError:
-			return str(tmp)
-
-
-# ################################################################## #
-# Helper Methods for Modules Used When Executing the Transpiled Code #
-# ################################################################## #
-
-def translate_output_to_swedish(data):
-	if isinstance(data, abc.KeysView):
-		data = list(data)
-
-	replace_dict = {
-		"True": 'Sant',
-		"False": 'Falskt',
-		"None": 'Inget',
-		"<class 'float'>": 'Decimaltal',
-		"<class 'str'>": 'Sträng',
-		"<class 'int'>": 'Heltal',
-		"<class 'list'>": 'Lista',
-		"<class 'dict'>": 'Lexikon',
-		"<class 'dict_keys'>": 'Lexikonnycklar',
-		"<class 'bool'>": 'Boolesk',
-		"<class 'IngetType'>": 'Inget',
-		"<class 'Exception'>": 'Feltyp',
-		"<class 'datetime.date'>": 'Datum',
-		"<class 'datetime.datetime'>": 'Datum & tid',
-		"<class 'range'>": 'Område'
-	}
-
-	data = str(data)
-	for key in replace_dict:
-		data = data.replace(key, replace_dict[key])
-
-	return data
-
-
-def translate_error(error_msg):
-	error_msg = error_msg.args[0]
-
-	translations = {
-		'unmatched': 'Syntaxfel!',
-		'division by zero': 'Nolldelningsfel!',
-		'index': 'Indexfel!',
-		'key': 'Nyckelfel!',
-		'lookup': 'Sökfel!',
-		'attribute': 'Attribut/Parameterfel!',
-		'unexpected EOF': 'Oväntat programslut!',
-		'result too large': 'Resultatet för stort!',
-		'import': 'Importeringsfel!',
-		'module': 'Modulfel',
-		'syntax': 'Syntaxfel',
-		'KeyboardInterrupt': 'Avbruten!',
-		'memory': 'Minnefel!',
-		'name': 'Namnfel!',
-		'recursion': 'Rekursionsfel',
-		'argument': 'Argumentfel!',
-		'type': 'Typfel!',
-		'referenced before': 'Referensfel!',
-		'unicode': 'Unicode-fel!',
-		'value': 'Värdefel!',
-		'file': 'Filfel!',
-		'timeout': 'Avbrottsfel!',
-		'warning': 'Varning!',
-		'indent': 'Indragsfel!',
-		'\'break\' outside loop': 'Brytningsfel: Bryt utanför loop!',
-		'invalid mode': 'Ogiltigt filläge!',
-		'concaten': 'Sammanfogningsfel!',
-	}
-
-	sv_error_message = ''
-
-	for key in translations:
-		if key in error_msg:
-			sv_error_message = translations[key]
-
-	if not sv_error_message:
-		sv_error_message = 'Fel! ENG: ' + error_msg
-
-	return sv_error_message
 
 
 # ############ #
@@ -160,42 +44,19 @@ def check_for_updates(version):
 			version) + ' men du kan uppdatera till Enkelt version ' + str(data_store['version']))
 
 
-def transpile_var(var):
-	vars = {
-		'själv': 'self',
-	}
+# ############## #
+# Helper Methods #
+# ############## #
 
-	try:
-		return vars[var]
-	except KeyError:
-		return var
-
-
-def maybe_place_space_before(parsed, token_val):
-	prefix = ' '
-
-	if parsed and parsed[-1] in ['\n', '\t', '(', ' ', '.']:
-		prefix = ''
-	parsed += prefix + token_val + ' '
-
-	return parsed
+def translate_clear():
+	if name == 'nt':
+		return 'cls'
+	return 'clear'
 
 
-def translate_function(func):
-	function_translations = functions_and_keywords()['functions']
-
-	translation = function_translations[func] if func in function_translations.keys() else func
-	if 'system("c' not in translation:
-		translation += '('
-
-	return translation
-
-
-def translate_keyword(keyword):
-	keyword_translations = functions_and_keywords()['keywords']
-
-	return keyword_translations[keyword] if keyword in keyword_translations.keys() else 'error'
-
+# ################### #
+# Library & Importing #
+# ################### #
 
 # Transpiles the source code of the library being imported.
 def transpile_library_code(library_code, library_name):
@@ -287,66 +148,9 @@ def import_library(library_name):
 					print('Det inträffade ett fel! Kunde inte importera ' + library_name)
 
 
-def parser(tokens):
-	global built_in_vars
-
-	is_skip = False
-	add_parenthesis_at_en_of_line = False
-
-	parsed = ''
-
-	for token_index, token in enumerate(tokens):
-		if is_skip:
-			is_skip = False
-			continue
-
-		token_type = token[0]
-		token_val = token[1]
-
-		if token_type in ['FORMAT', 'ASSIGN', 'NUM']:
-			if token_val == '\n' and add_parenthesis_at_en_of_line:
-				parsed += ')'
-				add_parenthesis_at_en_of_line = False
-			parsed += token_val
-		elif token_type == 'OP':
-			if token_val in ['.', ')', ',', ':'] and parsed and parsed[-1] == ' ':
-				parsed = parsed[:-1]
-
-			parsed += token_val
-
-			if token_val in [',', '=']:
-				parsed += ' '
-		elif token_type == 'STR':
-			token_val = token_val.replace('|-ENKELT_ESCAPED_BACKSLASH-|', '\\').replace('|-ENKELT_ESCAPED_QUOTE-|','\\"')
-			parsed += '"' + token_val + '"'
-		elif token_type == 'IMPORT':
-			import_library(token_val)
-		elif token_type == 'KEYWORD':
-			token_val = translate_keyword(token_val)
-			parsed = maybe_place_space_before(parsed, token_val)
-		elif token_type == 'VAR':
-			if token_val not in built_in_vars and token_index > 0:
-				parsed = maybe_place_space_before(parsed, token_val)
-			else:
-				parsed += transpile_var(token_val)
-		elif token_type == 'FUNC':
-			token_val = translate_function(token_val)
-			parsed += token_val
-		elif token_type == 'CLASS':
-			parsed += '\nclass ' + token_val
-		elif token_type == 'OBJ_NOTATION':
-			parsed += '\n' + translate_keyword(token_val) + ':'
-		elif token_type == 'FUNC_DEF':
-			parsed += 'def ' + token_val + '('
-		elif token_type == 'KEY':
-			parsed += '\'' + token_val + '\''
-
-		if len(parsed) > 3 and parsed[-1] == ' ' and parsed[-2] == '=' and parsed[-3] == ' ' and parsed[-4] == '=':
-			parsed = parsed[:-4]
-			parsed += ' == '
-
-	return parsed
-
+# ############## #
+# Lexing & Lexer #
+# ############## #
 
 def lex_var_keyword(tokens, tmp):
 	global variables
@@ -372,6 +176,49 @@ def lex_var_keyword(tokens, tmp):
 				variables.append(tmp)
 		tmp = ''
 	return tokens, tmp, collect, collect_ends, include_collect_end
+
+
+def add_part(parts, is_string, code):
+	parts.append({
+		'is_string': is_string,
+		'code': code
+	})
+
+	is_string = True
+
+	if code[-1] == '\n':
+		is_string = False
+
+	return parts, '', is_string
+
+
+def fix_up_code_line(statement):
+	statement = statement.replace("'", '"') \
+		.replace('\\"', '|-ENKELT_ESCAPED_QUOTE-|') \
+		.replace('\\', '|-ENKELT_ESCAPED_BACKSLASH-|')
+
+	# Remove spaces between function names and '('.
+	# Replaces four & two spaces with tab.
+	parts = []
+	is_string = False
+	tmp = ''
+
+	for char in statement:
+		tmp += char
+
+		if char == '"' and is_string:
+			parts, tmp, is_string = add_part(parts, True, tmp)
+			is_string = False
+		elif char in ['"', '\n']:
+			parts, tmp, is_string = add_part(parts, False, tmp)
+
+	statement = ''
+	for part in parts:
+		if not part['is_string']:
+			part['code'] = part['code'].replace('    ', '\t').replace('  ', '\t').replace(' (', '(')
+		statement += part['code']
+
+	return statement
 
 
 def lexer(raw):
@@ -470,47 +317,184 @@ def lexer(raw):
 	return tokens
 
 
-def add_part(parts, is_string, code):
-	parts.append({
-		'is_string': is_string,
-		'code': code
-	})
+# ####### #
+# Parsing #
+# ####### #
 
-	is_string = True
+def transpile_var(var):
+	vars = {
+		'själv': 'self',
+	}
 
-	if code[-1] == '\n':
-		is_string = False
+	try:
+		return vars[var]
+	except KeyError:
+		return var
 
-	return parts, '', is_string
+
+def maybe_place_space_before(parsed, token_val):
+	prefix = ' '
+
+	if parsed and parsed[-1] in ['\n', '\t', '(', ' ', '.']:
+		prefix = ''
+	parsed += prefix + token_val + ' '
+
+	return parsed
 
 
-def fix_up_code_line(statement):
-	statement = statement.replace("'", '"') \
-		.replace('\\"', '|-ENKELT_ESCAPED_QUOTE-|') \
-		.replace('\\', '|-ENKELT_ESCAPED_BACKSLASH-|')
+def translate_function(func):
+	function_translations = functions_and_keywords()['functions']
 
-	# Remove spaces between function names and '('.
-	# Replaces four & two spaces with tab.
-	parts = []
-	is_string = False
-	tmp = ''
+	translation = function_translations[func] if func in function_translations.keys() else func
+	if 'system("c' not in translation:
+		translation += '('
 
-	for char in statement:
-		tmp += char
+	return translation
 
-		if char == '"' and is_string:
-			parts, tmp, is_string = add_part(parts, True, tmp)
-			is_string = False
-		elif char in ['"', '\n']:
-			parts, tmp, is_string = add_part(parts, False, tmp)
 
-	statement = ''
-	for part in parts:
-		if not part['is_string']:
-			part['code'] = part['code'].replace('    ', '\t').replace('  ', '\t').replace(' (', '(')
-		statement += part['code']
+def translate_keyword(keyword):
+	keyword_translations = functions_and_keywords()['keywords']
 
-	return statement
+	return keyword_translations[keyword] if keyword in keyword_translations.keys() else 'error'
+
+
+def parser(tokens):
+	global built_in_vars
+
+	is_skip = False
+	add_parenthesis_at_en_of_line = False
+
+	parsed = ''
+
+	for token_index, token in enumerate(tokens):
+		if is_skip:
+			is_skip = False
+			continue
+
+		token_type = token[0]
+		token_val = token[1]
+
+		if token_type in ['FORMAT', 'ASSIGN', 'NUM']:
+			if token_val == '\n' and add_parenthesis_at_en_of_line:
+				parsed += ')'
+				add_parenthesis_at_en_of_line = False
+			parsed += token_val
+		elif token_type == 'OP':
+			if token_val in ['.', ')', ',', ':'] and parsed and parsed[-1] == ' ':
+				parsed = parsed[:-1]
+
+			parsed += token_val
+
+			if token_val in [',', '=']:
+				parsed += ' '
+		elif token_type == 'STR':
+			token_val = token_val.replace('|-ENKELT_ESCAPED_BACKSLASH-|', '\\').replace('|-ENKELT_ESCAPED_QUOTE-|','\\"')
+			parsed += '"' + token_val + '"'
+		elif token_type == 'IMPORT':
+			import_library(token_val)
+		elif token_type == 'KEYWORD':
+			token_val = translate_keyword(token_val)
+			parsed = maybe_place_space_before(parsed, token_val)
+		elif token_type == 'VAR':
+			if token_val not in built_in_vars and token_index > 0:
+				parsed = maybe_place_space_before(parsed, token_val)
+			else:
+				parsed += transpile_var(token_val)
+		elif token_type == 'FUNC':
+			token_val = translate_function(token_val)
+			parsed += token_val
+		elif token_type == 'CLASS':
+			parsed += '\nclass ' + token_val
+		elif token_type == 'OBJ_NOTATION':
+			parsed += '\n' + translate_keyword(token_val) + ':'
+		elif token_type == 'FUNC_DEF':
+			parsed += 'def ' + token_val + '('
+		elif token_type == 'KEY':
+			parsed += '\'' + token_val + '\''
+
+		if len(parsed) > 3 and parsed[-1] == ' ' and parsed[-2] == '=' and parsed[-3] == ' ' and parsed[-4] == '=':
+			parsed = parsed[:-4]
+			parsed += ' == '
+
+	return parsed
+
+
+# ################################## #
+# Transpiling, Building, & Executing #
+# ################################## #
+
+def translate_output_to_swedish(data):
+	if isinstance(data, abc.KeysView):
+		data = list(data)
+
+	replace_dict = {
+		"True": 'Sant',
+		"False": 'Falskt',
+		"None": 'Inget',
+		"<class 'float'>": 'Decimaltal',
+		"<class 'str'>": 'Sträng',
+		"<class 'int'>": 'Heltal',
+		"<class 'list'>": 'Lista',
+		"<class 'dict'>": 'Lexikon',
+		"<class 'dict_keys'>": 'Lexikonnycklar',
+		"<class 'bool'>": 'Boolesk',
+		"<class 'IngetType'>": 'Inget',
+		"<class 'Exception'>": 'Feltyp',
+		"<class 'datetime.date'>": 'Datum',
+		"<class 'datetime.datetime'>": 'Datum & tid',
+		"<class 'range'>": 'Område'
+	}
+
+	data = str(data)
+	for key in replace_dict:
+		data = data.replace(key, replace_dict[key])
+
+	return data
+
+
+def translate_error(error_msg):
+	error_msg = error_msg.args[0]
+
+	translations = {
+		'unmatched': 'Syntaxfel!',
+		'division by zero': 'Nolldelningsfel!',
+		'index': 'Indexfel!',
+		'key': 'Nyckelfel!',
+		'lookup': 'Sökfel!',
+		'attribute': 'Attribut/Parameterfel!',
+		'unexpected EOF': 'Oväntat programslut!',
+		'result too large': 'Resultatet för stort!',
+		'import': 'Importeringsfel!',
+		'module': 'Modulfel',
+		'syntax': 'Syntaxfel',
+		'KeyboardInterrupt': 'Avbruten!',
+		'memory': 'Minnefel!',
+		'name': 'Namnfel!',
+		'recursion': 'Rekursionsfel',
+		'argument': 'Argumentfel!',
+		'type': 'Typfel!',
+		'referenced before': 'Referensfel!',
+		'unicode': 'Unicode-fel!',
+		'value': 'Värdefel!',
+		'file': 'Filfel!',
+		'timeout': 'Avbrottsfel!',
+		'warning': 'Varning!',
+		'indent': 'Indragsfel!',
+		'\'break\' outside loop': 'Brytningsfel: Bryt utanför loop!',
+		'invalid mode': 'Ogiltigt filläge!',
+		'concaten': 'Sammanfogningsfel!',
+	}
+
+	sv_error_message = ''
+
+	for key in translations:
+		if key in error_msg:
+			sv_error_message = translations[key]
+
+	if not sv_error_message:
+		sv_error_message = 'Fel! ENG: ' + error_msg
+
+	return sv_error_message
 
 
 def build(tokens):
@@ -529,6 +513,31 @@ def build(tokens):
 	parsed = '\n' + ''.join(additional_library_code) + parsed
 
 	boilerplate = "from os import system\nfrom enkelt import enkelt_print, enkelt_input\ndef __enkelt__():\n\tprint('', end='')\n"
+
+	boilerplate += '\tclass tid:\n'
+	boilerplate += '\t\timport time\n'
+	boilerplate += '\t\timport datetime\n'
+	boilerplate += '\tepok = time.time\n'
+	boilerplate += '\ttid = time.ctime\n'
+	boilerplate += '\tdatum = datetime.date\n'
+	boilerplate += '\tnu = datetime.datetime.now\n'
+	boilerplate += '\tidag = datetime.date.today\n'
+
+	boilerplate += '\tdef enkelt_print(data):\n'
+	boilerplate += '\tprint(translate_output_to_swedish(data))\n'
+
+	boilerplate += '\tdef enkelt_input(prompt=''):\n'
+	boilerplate += '\t\ttmp = input(prompt)\n'
+	boilerplate += '\t\ttry:\n'
+	boilerplate += '\t\t\ttmp = int(tmp)\n'
+	boilerplate += '\t\t\treturn tmp\n'
+	boilerplate += '\t\texcept ValueError:\n'
+	boilerplate += '\t\t\ttry:\n'
+	boilerplate += '\t\t\t\ttmp = float(tmp)\n'
+	boilerplate += '\t\t\t\treturn tmp\n'
+	boilerplate += '\t\t\texcept ValueError:\n'
+	boilerplate += '\t\t\t\treturn str(tmp)\n'
+
 	boilerplate += '\tclass matte:\n'
 	boilerplate += '\t\timport math\n'
 	boilerplate += '\t\ttak = math.ceil\n'
@@ -612,6 +621,10 @@ def transpile(source_lines):
 	check_for_updates(version_nr)
 
 
+# ############### #
+# Setup & Startup #
+# ############### #
+
 def startup(file_name):
 	global version_nr
 	global is_dev
@@ -638,12 +651,6 @@ def start_console(first_run):
 	transpile([cmd])
 
 	start_console(False)
-
-
-def translate_clear():
-	if name == 'nt':
-		return 'cls'
-	return 'clear'
 
 
 def functions_and_keywords():
@@ -726,6 +733,7 @@ built_in_vars = ['själv']
 variables = built_in_vars
 console_mode_variable_source_code = []
 keywords = functions_and_keywords()['keywords']
+
 special_keywords = {
 	'klass': {
 		'type': 'CLASS',
