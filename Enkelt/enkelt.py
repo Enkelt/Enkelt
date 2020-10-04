@@ -600,7 +600,7 @@ def build(tokens):
 
 def transpile(source_lines):
 	source_lines.insert(0, '\n')
-	source_lines.append('\n')
+	source_lines[-1] += '\n'
 
 	tokens_list = lexer(source_lines)
 
@@ -803,5 +803,11 @@ if __name__ == '__main__' and not is_running_tests:
 			start_console(True)
 	except Exception as e:
 		print(translate_error(e))
+		if is_dev:
+			print('--DEV: ERROR MESSAGE')
+			print(e)
+			import traceback
+			traceback.print_exc()
+
 		if is_console:
 			start_console(False)
