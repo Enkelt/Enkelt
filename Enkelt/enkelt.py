@@ -20,7 +20,6 @@
 
 from sys import argv, version_info
 from os import getcwd, path, name, getenv, remove
-from collections import abc
 import urllib.request
 
 
@@ -423,35 +422,6 @@ def parser(tokens):
 # Transpiling, Building, & Executing #
 # ################################## #
 
-def translate_output_to_swedish(data):
-	if isinstance(data, abc.KeysView):
-		data = list(data)
-
-	replace_dict = {
-		"True": 'Sant',
-		"False": 'Falskt',
-		"None": 'Inget',
-		"<class 'float'>": 'Decimaltal',
-		"<class 'str'>": 'Sträng',
-		"<class 'int'>": 'Heltal',
-		"<class 'list'>": 'Lista',
-		"<class 'dict'>": 'Lexikon',
-		"<class 'dict_keys'>": 'Lexikonnycklar',
-		"<class 'bool'>": 'Boolesk',
-		"<class 'IngetType'>": 'Inget',
-		"<class 'Exception'>": 'Feltyp',
-		"<class 'datetime.date'>": 'Datum',
-		"<class 'datetime.datetime'>": 'Datum & tid',
-		"<class 'range'>": 'Område'
-	}
-
-	data = str(data)
-	for key in replace_dict:
-		data = data.replace(key, replace_dict[key])
-
-	return data
-
-
 def translate_error(error_msg):
 	error_msg = error_msg.args[0]
 
@@ -512,21 +482,46 @@ def build(tokens):
 
 	parsed = '\n' + ''.join(additional_library_code) + parsed
 
-	boilerplate = "from os import system\nfrom enkelt import enkelt_print, enkelt_input\ndef __enkelt__():\n\tprint('', end='')\n"
+	boilerplate = "from os import system\nfrom collections import abc\n\n\ndef __enkelt__():\n\tprint('', end='')\n"
 
-	boilerplate += '\tclass tid:\n'
+	boilerplate += '\n\tclass tid:\n'
 	boilerplate += '\t\timport time\n'
-	boilerplate += '\t\timport datetime\n'
-	boilerplate += '\tepok = time.time\n'
-	boilerplate += '\ttid = time.ctime\n'
-	boilerplate += '\tdatum = datetime.date\n'
-	boilerplate += '\tnu = datetime.datetime.now\n'
-	boilerplate += '\tidag = datetime.date.today\n'
+	boilerplate += '\t\timport datetime\n\n'
+	boilerplate += '\t\tepok = time.time\n'
+	boilerplate += '\t\ttid = time.ctime\n'
+	boilerplate += '\t\tdatum = datetime.date\n'
+	boilerplate += '\t\tnu = datetime.datetime.now\n'
+	boilerplate += '\t\tidag = datetime.date.today\n'
 
-	boilerplate += '\tdef enkelt_print(data):\n'
-	boilerplate += '\tprint(translate_output_to_swedish(data))\n'
+	boilerplate += '\n\tdef translate_output_to_swedish(data):\n'
+	boilerplate += '\t\tif isinstance(data, abc.KeysView):\n'
+	boilerplate += '\t\t\tdata = list(data)\n'
+	boilerplate += '\t\treplace_dict = {\n'
+	boilerplate += '\t\t\t"True": \'Sant\',\n'
+	boilerplate += '\t\t\t"False": \'Falskt\',\n'
+	boilerplate += '\t\t\t"None": \'Inget\',\n'
+	boilerplate += '\t\t\t"<class \'float\'>": \'Decimaltal\',\n'
+	boilerplate += '\t\t\t"<class \'str\'>": \'Sträng\',\n'
+	boilerplate += '\t\t\t"<class \'int\'>": \'Heltal\',\n'
+	boilerplate += '\t\t\t"<class \'list\'>": \'Lista\',\n'
+	boilerplate += '\t\t\t"<class \'dict\'>": \'Lexikon\',\n'
+	boilerplate += '\t\t\t"<class \'dict_keys\'>": \'Lexikonnycklar\',\n'
+	boilerplate += '\t\t\t"<class \'bool\'>": \'Boolesk\',\n'
+	boilerplate += '\t\t\t"<class \'IngetType\'>": \'Inget\',\n'
+	boilerplate += '\t\t\t"<class \'Exception\'>": \'Feltyp\',\n'
+	boilerplate += '\t\t\t"<class \'datetime.date\'>": \'Datum\',\n'
+	boilerplate += '\t\t\t"<class \'datetime.datetime\'>": \'Datum & tid\',\n'
+	boilerplate += '\t\t\t"<class \'range\'>": \'Område\'\n'
+	boilerplate += '\t\t}\n'
+	boilerplate += '\t\tdata = str(data)\n'
+	boilerplate += '\t\tfor key in replace_dict:\n'
+	boilerplate += '\t\t\tdata = data.replace(key, replace_dict[key])\n'
+	boilerplate += '\t\treturn data\n'
 
-	boilerplate += '\tdef enkelt_input(prompt=''):\n'
+	boilerplate += '\n\tdef enkelt_print(data):\n'
+	boilerplate += '\t\tprint(translate_output_to_swedish(data))\n'
+
+	boilerplate += '\n\tdef enkelt_input(prompt=\'\'):\n'
 	boilerplate += '\t\ttmp = input(prompt)\n'
 	boilerplate += '\t\ttry:\n'
 	boilerplate += '\t\t\ttmp = int(tmp)\n'
@@ -538,7 +533,7 @@ def build(tokens):
 	boilerplate += '\t\t\texcept ValueError:\n'
 	boilerplate += '\t\t\t\treturn str(tmp)\n'
 
-	boilerplate += '\tclass matte:\n'
+	boilerplate += '\n\tclass matte:\n'
 	boilerplate += '\t\timport math\n'
 	boilerplate += '\t\ttak = math.ceil\n'
 	boilerplate += '\t\tgolv = math.floor\n'
@@ -556,15 +551,15 @@ def build(tokens):
 	boilerplate += '\t\tradianer = math.radians\n'
 	boilerplate += '\t\tabs = abs\n'
 
-	boilerplate += '\t\t@staticmethod\n'
+	boilerplate += '\n\t\t@staticmethod\n'
 	boilerplate += '\t\tdef e():\n'
 	boilerplate += '\t\t\tfrom math import e\n'
 	boilerplate += '\t\t\treturn e\n'
 
-	boilerplate += '\t\t@staticmethod\n'
+	boilerplate += '\n\t\t@staticmethod\n'
 	boilerplate += '\t\tdef pi():\n'
 	boilerplate += '\t\t\tfrom math import pi\n'
-	boilerplate += '\t\t\treturn pi\n'
+	boilerplate += '\t\t\treturn pi'
 
 	for variable_source_code in console_mode_variable_source_code:
 		if variable_source_code not in console_mode_variable_source_code_to_ignore:
@@ -605,6 +600,7 @@ def build(tokens):
 
 def transpile(source_lines):
 	source_lines.insert(0, '\n')
+	source_lines.append('\n')
 
 	tokens_list = lexer(source_lines)
 
