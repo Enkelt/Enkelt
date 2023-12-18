@@ -19,7 +19,7 @@ Kör Enkelt med `python3 enkelt.py [filnamn].e` alternativ `python3 enkelt.py` f
 Enkelt är fri programvara och använder GNU GPL v3 licensen. Läs mer om licensen på [gnu.org](https://gnu.org)
 
 # Problem och buggrapportering
-Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett e-postmeddelande eller göra en ny _problemraport_ på Enkelt-Dev-projektet [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub-profil. Du kan också skicka meddelanden direkt till [kontakt@me@edvard.dev](mailto:me@edvard.dev)
+Om du hittar ett problem eller en bugg i Enkelt kan du antingen skicka ett e-postmeddelande eller göra en ny _problemraport_ på Enkelt-Dev-projektet [här](https://github.com/Enkelt/Enkelt-Dev/issues) men då måst du ha en GitHub-profil. Du kan också skicka meddelanden direkt till [me@edvard.dev](mailto:me@edvard.dev)
 
 # Utvecklare
 ## Enkelt har arbetats på och utvecklats av följande personer:
